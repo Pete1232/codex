@@ -13,29 +13,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-lazy val testScalastyle = taskKey[Unit]("testScalastyle")
-(testScalastyle in Test) := scalastyle.in(Test).toTask("").value
+package repositories.collections
 
-lazy val root = (project in file("."))
-  .settings(
-    name := "cricket-coach",
-    version := "1.0",
-    scalaVersion := "2.12.3",
-    libraryDependencies ++= Dependencies())
-  .configs(IntegrationTest)
-  .settings(
-    Defaults.itSettings
-  )
-  .settings(
-    wartremoverErrors ++= Warts.unsafe
-  )
-  .settings(
-    (test in Test) := ((test in Test) dependsOn (testScalastyle in Test)).value,
-    scalastyleFailOnError := false
-  )
-  .settings(
-    coverageEnabled := true,
-    coverageMinimum := 100,
-    coverageFailOnMinimum := true,
-    coverageExcludedPackages := "utils.Constants"
-  )
+import cats.data.Reader
+import org.mongodb.scala.bson.collection.immutable.Document
+import org.mongodb.scala.{Completed, MongoDatabase}
+import utils.Constants
+
+trait Players {
+  private val collection = Reader { (db: MongoDatabase) =>
+    db.getCollection(Constants.Collections.PLAYERS)
+  }
+
+  protected def insertTestDocument() = {
+    val doc = Document("name" -> "bob")
+    collection.map(collection =>
+      collection
+        .insertOne(doc)
+        .subscribe((_: Completed) => (): Unit)
+    )
+  }
+}

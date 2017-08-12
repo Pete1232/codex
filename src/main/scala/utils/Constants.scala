@@ -13,29 +13,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-lazy val testScalastyle = taskKey[Unit]("testScalastyle")
-(testScalastyle in Test) := scalastyle.in(Test).toTask("").value
+package utils
 
-lazy val root = (project in file("."))
-  .settings(
-    name := "cricket-coach",
-    version := "1.0",
-    scalaVersion := "2.12.3",
-    libraryDependencies ++= Dependencies())
-  .configs(IntegrationTest)
-  .settings(
-    Defaults.itSettings
-  )
-  .settings(
-    wartremoverErrors ++= Warts.unsafe
-  )
-  .settings(
-    (test in Test) := ((test in Test) dependsOn (testScalastyle in Test)).value,
-    scalastyleFailOnError := false
-  )
-  .settings(
-    coverageEnabled := true,
-    coverageMinimum := 100,
-    coverageFailOnMinimum := true,
-    coverageExcludedPackages := "utils.Constants"
-  )
+object Constants {
+
+  object Collections {
+    final val PLAYERS = "players"
+  }
+
+}

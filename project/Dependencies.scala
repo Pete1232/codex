@@ -31,7 +31,8 @@ object Dependencies {
     "org.typelevel" %% "cats-core" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
     "org.mongodb.scala" %% "mongo-scala-driver" % "2.1.0",
-    "org.scalactic" %% "scalactic" % "3.0.1"
+    "org.scalactic" %% "scalactic" % "3.0.1",
+    "com.typesafe" % "config" % "1.3.1"
   ) ++ circe
 
   private lazy val test = Seq(
