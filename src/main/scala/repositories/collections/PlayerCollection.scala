@@ -17,18 +17,21 @@ package repositories.collections
 
 import cats.data.Reader
 import org.mongodb.scala.MongoDatabase
-import org.mongodb.scala.bson.collection.immutable.Document
+import repositories.models.Player
 import utils.Constants
 
 import scala.concurrent.ExecutionContext
 
-trait Players {
+trait PlayerCollection {
+
+  implicit val ec: ExecutionContext
+
   private val collection = Reader { (db: MongoDatabase) =>
-    db.getCollection(Constants.Collections.PLAYERS)
+    db.getCollection[Player](Constants.Collections.PLAYERS)
   }
 
-  protected def insertTestDocument(implicit ec: ExecutionContext) = {
-    val doc = Document("name" -> "bob")
+  protected def insertTestDocument() = {
+    val doc = Player("bob")
     collection.map(collection =>
       collection
         .insertOne(doc)

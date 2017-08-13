@@ -55,5 +55,6 @@ trait Database {
   protected val database = client.map(settings =>
     MongoClient(clientSettings = settings)
       .getDatabase("cc")
+      .withCodecRegistry(Codecs.buildCodecs())
   )
 }

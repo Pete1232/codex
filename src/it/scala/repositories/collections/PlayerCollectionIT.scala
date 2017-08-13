@@ -13,30 +13,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import sbt._
+package repositories.collections
 
-object Dependencies {
+import testutils.IntegrationTest
 
-  private val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
-
-  private lazy val compile = Seq(
-    "org.typelevel" %% "cats-core" % "1.0.0-MF",
-    "org.typelevel" %% "cats-effect" % "0.4",
-    "com.chuusai" %% "shapeless" % "2.3.2",
-    "org.mongodb.scala" %% "mongo-scala-driver" % "2.1.0",
-    "org.scalactic" %% "scalactic" % "3.0.1",
-    "com.typesafe" % "config" % "1.3.1"
-  )
-
-  private lazy val test = Seq(
-    scalatest,
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0",
-    "org.scalacheck" %% "scalacheck" % "1.13.4"
-  ).map(_ % Test)
-
-  private lazy val it = Seq(
-    scalatest
-  ).map(_ % IntegrationTest)
-
-  def apply(): Seq[ModuleID] = compile ++ test ++ it
+class PlayerCollectionIT extends IntegrationTest with PlayerCollection {
+  "insertTestDocument" must {
+    "insert" in { db =>
+      await {
+        insertTestDocument().run(db)
+      } mustBe ((): Unit)
+    }
+  }
 }

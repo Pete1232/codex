@@ -27,7 +27,8 @@ lazy val root = (project in file("."))
     Defaults.itSettings
   )
   .settings(
-    wartremoverErrors ++= Warts.unsafe
+    wartremoverErrors ++= Warts.unsafe,
+    wartremoverExcluded += baseDirectory.value / "src" / "main" / "scala" / "repositories" / "utils" / "Codecs.scala"
   )
   .settings(
     (test in Test) := ((test in Test) dependsOn (testScalastyle in Test)).value,

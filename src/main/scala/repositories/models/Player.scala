@@ -13,16 +13,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package repositories.collections
+package repositories.models
 
-import testutils.IntegrationTest
-
-class PlayersIT extends IntegrationTest with Players {
-  "insertTestDocument" must {
-    "insert" in { db =>
-      await {
-        insertTestDocument.run(db)
-      } mustBe ((): Unit)
-    }
-  }
-}
+final case class Player(name: String)
