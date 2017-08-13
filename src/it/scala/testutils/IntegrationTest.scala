@@ -15,36 +15,41 @@
 // limitations under the License.
 package testutils
 
+import cats.Eval
+import cats.effect.IO
 import config.AppConfig
 import org.mongodb.scala.MongoDatabase
 import org.scalatest._
 import repositories.utils.Database
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Awaitable, ExecutionContext}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
-
-trait IntegrationTest extends fixture.AsyncWordSpec with MustMatchers {
+trait IntegrationTest extends fixture.WordSpec with MustMatchers {
 
   override type FixtureParam = MongoDatabase
 
-  override def withFixture(test: OneArgAsyncTest): FutureOutcome = {
-
-    object TestDatabase extends Database {
-      val db = database.run(AppConfig)
-    }
-
-    complete {
-      withFixture(test.toNoArgAsyncTest(TestDatabase.db))
-    } lastly {
-      await {
-        TestDatabase.db.drop().head().map(_ => (): Unit)
-      }
-    }
-
+  object TestDatabase extends Database {
+    val db = database.run(AppConfig)
   }
 
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  private def dropDatabase = {
+    IO.fromFuture(Eval.later(
+      TestDatabase.db.drop().head().map(_ => (): Unit)
+    ))
+  }
 
-  def await[T](awaitable: Awaitable[T]): T = Await.result(awaitable, Duration.Inf)
+  override def withFixture(test: OneArgTest): Outcome = {
+
+    try {
+      withFixture(test.toNoArgTest(TestDatabase.db))
+    } finally {
+      dropDatabase.unsafeRunSync()
+    }
+  }
+
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+
+  protected val defaultTimeout: FiniteDuration = 500 millis
 }

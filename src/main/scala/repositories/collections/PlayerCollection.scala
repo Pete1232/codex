@@ -15,7 +15,9 @@
 // limitations under the License.
 package repositories.collections
 
+import cats.Eval
 import cats.data.Reader
+import cats.effect.{Effect, IO}
 import org.mongodb.scala.MongoDatabase
 import repositories.models.Player
 import utils.Constants
@@ -33,10 +35,12 @@ trait PlayerCollection {
   protected def insertTestDocument() = {
     val doc = Player("bob")
     collection.map(collection =>
-      collection
-        .insertOne(doc)
-        .head()
-        .map(_ => (): Unit)
+      IO.fromFuture(Eval.later(
+        collection
+          .insertOne(doc)
+          .head()
+          .map(_ => (): Unit)
+      ))
     )
   }
 }

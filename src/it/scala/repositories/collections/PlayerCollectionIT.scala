@@ -20,9 +20,7 @@ import testutils.IntegrationTest
 class PlayerCollectionIT extends IntegrationTest with PlayerCollection {
   "insertTestDocument" must {
     "insert" in { db =>
-      await {
-        insertTestDocument().run(db)
-      } mustBe ((): Unit)
+      insertTestDocument().run(db).unsafeRunTimed(defaultTimeout) mustBe Some((): Unit)
     }
   }
 }
