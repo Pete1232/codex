@@ -15,8 +15,36 @@
 // limitations under the License.
 package testutils
 
-import org.scalatest.{AsyncWordSpec, MustMatchers}
+import config.AppConfig
+import org.mongodb.scala.MongoDatabase
+import org.scalatest._
+import repositories.utils.Database
 
-trait IntegrationTest extends AsyncWordSpec with MustMatchers {
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Awaitable, ExecutionContext}
 
+
+trait IntegrationTest extends fixture.AsyncWordSpec with MustMatchers {
+
+  override type FixtureParam = MongoDatabase
+
+  override def withFixture(test: OneArgAsyncTest): FutureOutcome = {
+
+    object TestDatabase extends Database {
+      val db = database.run(AppConfig)
+    }
+
+    complete {
+      withFixture(test.toNoArgAsyncTest(TestDatabase.db))
+    } lastly {
+      await {
+        TestDatabase.db.drop().head().map(_ => (): Unit)
+      }
+    }
+
+  }
+
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+
+  def await[T](awaitable: Awaitable[T]): T = Await.result(awaitable, Duration.Inf)
 }

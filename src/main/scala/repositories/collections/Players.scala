@@ -16,21 +16,24 @@
 package repositories.collections
 
 import cats.data.Reader
+import org.mongodb.scala.MongoDatabase
 import org.mongodb.scala.bson.collection.immutable.Document
-import org.mongodb.scala.{Completed, MongoDatabase}
 import utils.Constants
+
+import scala.concurrent.ExecutionContext
 
 trait Players {
   private val collection = Reader { (db: MongoDatabase) =>
     db.getCollection(Constants.Collections.PLAYERS)
   }
 
-  protected def insertTestDocument() = {
+  protected def insertTestDocument(implicit ec: ExecutionContext) = {
     val doc = Document("name" -> "bob")
     collection.map(collection =>
       collection
         .insertOne(doc)
-        .subscribe((_: Completed) => (): Unit)
+        .head()
+        .map(_ => (): Unit)
     )
   }
 }

@@ -15,16 +15,14 @@
 // limitations under the License.
 package repositories.collections
 
-import config.AppConfig
-import repositories.utils.Database
 import testutils.IntegrationTest
 
-class PlayersIT extends IntegrationTest with Players with Database {
+class PlayersIT extends IntegrationTest with Players {
   "insertTestDocument" must {
-    "insert" in {
-      database.map( db =>
-        insertTestDocument().run(db)
-      ).run(AppConfig) mustBe ((): Unit)
+    "insert" in { db =>
+      await {
+        insertTestDocument.run(db)
+      } mustBe ((): Unit)
     }
   }
 }
