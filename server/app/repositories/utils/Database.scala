@@ -31,7 +31,7 @@ trait Database {
     createScramSha1Credential(
       mongoUser,
       mongoAuthDbName,
-      mongoPassword.toCharArray,
+      mongoPassword.toCharArray
     )
   }
 

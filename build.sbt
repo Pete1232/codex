@@ -13,26 +13,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-lazy val testScalastyle = taskKey[Unit]("testScalastyle")
-(testScalastyle in Test) := scalastyle.in(Test).toTask("").value
+val APP_NAME = "codex"
+val SCALA_VERSION = "2.12.3"
 
-lazy val root = (project in file("."))
-  .settings(
-    name := "cricket-coach",
-    version := "1.0",
-    scalaVersion := "2.12.3",
-    libraryDependencies ++= Dependencies())
+lazy val server = (project in file("server"))
+  .enablePlugins(PlayScala)
   .configs(IntegrationTest)
   .settings(
-    Defaults.itSettings
+    scalaVersion := SCALA_VERSION,
+    libraryDependencies ++= Dependencies()
   )
   .settings(
     wartremoverErrors ++= Warts.unsafe,
-    wartremoverExcluded += baseDirectory.value / "src" / "main" / "scala" / "repositories" / "utils" / "Codecs.scala"
+    wartremoverExcluded += baseDirectory.value / "app" / "repositories" / "utils" / "Codecs.scala"
   )
   .settings(
-    (test in Test) := ((test in Test) dependsOn (testScalastyle in Test)).value,
-    scalastyleFailOnError := false
+    Defaults.itSettings,
+    sourceDirectory in IntegrationTest := baseDirectory.value / "it",
+    unmanagedSourceDirectories in IntegrationTest += (sourceDirectory in IntegrationTest).value
+  )
+  .settings(
+    test in Test := ((test in Test) dependsOn scalastyle.in(Compile).toTask("")).value,
+    test in IntegrationTest := ((test in IntegrationTest) dependsOn scalastyle.in(Compile).toTask("")).value,
+    scalastyleFailOnError := true
   )
   .settings(
     coverageEnabled := true,
