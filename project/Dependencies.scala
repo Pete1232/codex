@@ -17,7 +17,7 @@ import sbt._
 
 object Dependencies {
 
-  private val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
+  private val scalatestPlusPlay = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.1"
 
   private lazy val compile = Seq(
     "org.typelevel" %% "cats-core" % "1.0.0-MF",
@@ -29,13 +29,13 @@ object Dependencies {
   )
 
   private lazy val test = Seq(
-    scalatest,
+    scalatestPlusPlay,
     "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0",
     "org.scalacheck" %% "scalacheck" % "1.13.4"
   ).map(_ % Test)
 
   private lazy val it = Seq(
-    scalatest
+    scalatestPlusPlay
   ).map(_ % IntegrationTest)
 
   def apply(): Seq[ModuleID] = compile ++ test ++ it

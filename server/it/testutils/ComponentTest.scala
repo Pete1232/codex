@@ -13,12 +13,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
-)
+package testutils
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.3")
+import config.AppLoader
+import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.play.{BaseOneAppPerSuite, FakeApplicationFactory}
+import play.api.{Application, ApplicationLoader, Environment}
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.9.0")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Awaitable}
+
+trait ComponentTest extends WordSpec with MustMatchers with BaseOneAppPerSuite with FakeApplicationFactory {
+  def await[T](awaitable: Awaitable[T], duration: Duration = Duration.Inf): T = Await.result(awaitable, duration)
+
+  lazy val appLoader = new AppLoader
+
+  override def fakeApplication(): Application = appLoader.load(ApplicationLoader.createContext(Environment.simple()))
+}

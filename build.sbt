@@ -24,17 +24,21 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Dependencies()
   )
   .settings(
-    wartremoverErrors ++= Warts.unsafe,
-    wartremoverExcluded += baseDirectory.value / "app" / "repositories" / "utils" / "Codecs.scala"
-  )
-  .settings(
     Defaults.itSettings,
     sourceDirectory in IntegrationTest := baseDirectory.value / "it",
     unmanagedSourceDirectories in IntegrationTest += (sourceDirectory in IntegrationTest).value
   )
   .settings(
-    test in Test := ((test in Test) dependsOn scalastyle.in(Compile).toTask("")).value,
-    test in IntegrationTest := ((test in IntegrationTest) dependsOn scalastyle.in(Compile).toTask("")).value,
+    test in Test := {
+      (test in Test)
+        .dependsOn(scalastyle.in(Compile).toTask(""))
+        .dependsOn(scalastyle.in(Test).toTask(""))
+    }.value,
+    test in IntegrationTest := {
+      (test in IntegrationTest)
+        .dependsOn(scalastyle.in(Compile).toTask(""))
+        .dependsOn(scalastyle.in(IntegrationTest).toTask(""))
+    }.value,
     scalastyleFailOnError := true
   )
   .settings(

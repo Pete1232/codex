@@ -13,12 +13,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
-)
+package components.healthcheck
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.3")
+import play.api.http.Status
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import testutils.ComponentTest
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.9.0")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+class HealthcheckComponentTest extends ComponentTest {
+
+  "ping" must {
+    s"return ${Status.OK} status with no body" in {
+
+      val Some(res) = route(app, FakeRequest("GET", "/ping"))
+
+      val result = await(res)
+
+      result.header.status mustBe Status.OK
+      result.body.isKnownEmpty mustBe true
+    }
+  }
+}

@@ -13,12 +13,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
-)
+package testutils
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.3")
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import org.scalamock.scalatest.MockFactory
+import org.scalatest._
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.9.0")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Awaitable, ExecutionContext}
+
+trait UnitTest extends WordSpec with MustMatchers with MockFactory with OneInstancePerTest {
+  implicit val actorSystem: ActorSystem = ActorSystem()
+  implicit val mat: ActorMaterializer = ActorMaterializer()
+  implicit val ec: ExecutionContext = ExecutionContext.global
+
+  def await[T](awaitable: Awaitable[T], duration: Duration = Duration.Inf): T = Await.result(awaitable, duration)
+}

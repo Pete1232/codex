@@ -13,12 +13,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
-)
+package components.healthcheck
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.3")
+import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.9.0")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+class HealthcheckController(val controllerComponents: ControllerComponents) extends BaseController {
+
+  def ping: Action[AnyContent] = Action(Ok)
+
+}
