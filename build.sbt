@@ -45,5 +45,8 @@ lazy val server = (project in file("server"))
     coverageEnabled := true,
     coverageMinimum := 100,
     coverageFailOnMinimum := true,
-    coverageExcludedPackages := "utils.Constants"
+    coverageExcludedPackages := "utils.Constants;.*Reverse.*;router.*;codex.*"
+  )
+  .settings(
+    addCommandAlias("fullTest", "; clean ; update ; coverage ; test ; it:test ; coverageReport")
   )
