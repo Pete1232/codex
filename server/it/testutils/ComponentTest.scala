@@ -17,13 +17,13 @@ package testutils
 
 import config.AppLoader
 import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.{BaseOneAppPerSuite, FakeApplicationFactory}
+import org.scalatestplus.play.{BaseOneAppPerTest, FakeApplicationFactory}
 import play.api.{Application, ApplicationLoader, Environment}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Awaitable}
 
-trait ComponentTest extends WordSpec with MustMatchers with BaseOneAppPerSuite with FakeApplicationFactory {
+trait ComponentTest extends WordSpec with MustMatchers with BaseOneAppPerTest with FakeApplicationFactory {
   def await[T](awaitable: Awaitable[T], duration: Duration = Duration.Inf): T = Await.result(awaitable, duration)
 
   lazy val appLoader = new AppLoader

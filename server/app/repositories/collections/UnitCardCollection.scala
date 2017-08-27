@@ -17,29 +17,37 @@ package repositories.collections
 
 import cats.Eval
 import cats.data.Reader
-import cats.effect.{Effect, IO}
+import cats.effect.IO
 import org.mongodb.scala.MongoDatabase
-import repositories.models.Player
+import repositories.models.UnitCard
 import utils.Constants
 
 import scala.concurrent.ExecutionContext
 
-trait PlayerCollection {
+trait UnitCardCollection {
 
   implicit val ec: ExecutionContext
 
   private val collection = Reader { (db: MongoDatabase) =>
-    db.getCollection[Player](Constants.Collections.PLAYERS)
+    db.getCollection[UnitCard](Constants.Collections.PLAYERS)
   }
 
   protected def insertTestDocument() = {
-    val doc = Player("bob")
+    val doc = UnitCard("bob")
     collection.map(collection =>
       IO.fromFuture(Eval.later(
         collection
           .insertOne(doc)
           .head()
           .map(_ => (): Unit)
+      ))
+    )
+  }
+
+  protected def getUnitCard = {
+    collection.map( collection =>
+      IO.fromFuture(Eval.later(
+        collection.find().head()
       ))
     )
   }

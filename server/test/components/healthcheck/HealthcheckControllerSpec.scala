@@ -17,9 +17,9 @@ package components.healthcheck
 
 import play.api.http.Status
 import play.api.test.FakeRequest
-import testutils.HealthcheckControllerUnitTest
+import testutils.ControllerUnitTest
 
-class HealthcheckControllerSpec extends HealthcheckControllerUnitTest {
+class HealthcheckControllerSpec extends ControllerUnitTest {
 
   lazy val controller = new HealthcheckController(mockControllerComponents)
 

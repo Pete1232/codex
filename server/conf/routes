@@ -1,3 +1,5 @@
 GET         /ping               components.healthcheck.HealthcheckController.ping
 
 GET        /assets/*file        controllers.Assets.at(path = "/public", file)
+
+->         /codex               codex.Routes

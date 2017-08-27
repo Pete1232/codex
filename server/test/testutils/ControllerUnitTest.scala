@@ -13,14 +13,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package repositories.collections
+package testutils
 
-import testutils.IntegrationTest
+import play.api.mvc.{BodyParsers, ControllerComponents, DefaultActionBuilder}
 
-class PlayerCollectionIT extends IntegrationTest with PlayerCollection {
-  "insertTestDocument" must {
-    "insert" in { db =>
-      insertTestDocument().run(db).unsafeRunTimed(defaultTimeout) mustBe Some((): Unit)
-    }
-  }
+trait ControllerUnitTest extends UnitTest {
+  lazy val mockControllerComponents: ControllerComponents = stub[ControllerComponents]
+  mockControllerComponents.actionBuilder _ when() returns DefaultActionBuilder(new BodyParsers.Default)
 }

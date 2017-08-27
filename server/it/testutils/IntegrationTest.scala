@@ -51,5 +51,5 @@ trait IntegrationTest extends fixture.WordSpec with MustMatchers {
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
 
-  protected val defaultTimeout: FiniteDuration = 500 millis
+  protected val defaultTimeout: FiniteDuration = 1 second
 }

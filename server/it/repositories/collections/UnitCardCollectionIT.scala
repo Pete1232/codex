@@ -13,11 +13,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package testutils
+package repositories.collections
 
-import play.api.mvc.{BodyParsers, ControllerComponents, DefaultActionBuilder}
+import repositories.models.UnitCard
+import testutils.IntegrationTest
 
-trait HealthcheckControllerUnitTest extends UnitTest {
-  lazy val mockControllerComponents: ControllerComponents = stub[ControllerComponents]
-  mockControllerComponents.actionBuilder _ when() returns DefaultActionBuilder(new BodyParsers.Default)
+class UnitCardCollectionIT extends IntegrationTest with UnitCardCollection {
+  "insertTestDocument" must {
+    "insert" in { db =>
+      insertTestDocument().run(db).unsafeRunTimed(defaultTimeout) mustBe Some((): Unit)
+    }
+  }
+
+  "getUnitCard" must {
+    "return the first saved UnitCard from the database" in { db =>
+      insertTestDocument().run(db).unsafeRunTimed(defaultTimeout)
+
+      val Some(res) = getUnitCard.run(db).unsafeRunTimed(defaultTimeout)
+
+      res mustBe UnitCard("bob")
+    }
+  }
 }

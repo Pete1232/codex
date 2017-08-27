@@ -13,6 +13,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package repositories.models
+package components.unitcard
 
-final case class Player(name: String)
+import play.api.mvc.{BaseController, ControllerComponents}
+
+class UnitCardController(val controllerComponents: ControllerComponents) extends BaseController {
+
+  def getUnitCard = TODO
+
+}

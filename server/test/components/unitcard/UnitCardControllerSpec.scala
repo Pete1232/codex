@@ -13,17 +13,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package repositories.utils
+package components.unitcard
 
-import org.bson.codecs.configuration.CodecRegistry
+import play.api.http.Status
+import play.api.test.FakeRequest
+import testutils.ControllerUnitTest
 
-object Codecs {
-  def buildCodecs(): CodecRegistry = {
-    import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
-    import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
-    import org.mongodb.scala.bson.codecs.Macros._
-    import repositories.models._
-    fromRegistries(fromProviders(classOf[UnitCard]), DEFAULT_CODEC_REGISTRY)
+class UnitCardControllerSpec extends ControllerUnitTest {
+  lazy val controller = new UnitCardController(mockControllerComponents)
+
+  "getUnitCard" must {
+    s"be TODO" in {
+
+      val req = FakeRequest("GET", "/codex/unit")
+
+      val res = await {
+        controller.getUnitCard(req)
+      }
+
+      res.header.status mustBe Status.NOT_IMPLEMENTED
+    }
   }
-
 }

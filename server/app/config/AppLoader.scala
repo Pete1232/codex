@@ -25,9 +25,12 @@ class AppLoader extends ApplicationLoader {
   class AppComponents(context: Context) extends BuiltInComponentsFromContext(context)
     with HttpFiltersComponents
     with controllers.AssetsComponents {
-    lazy val applicationController = new components.healthcheck.HealthcheckController(controllerComponents)
+    lazy val healthcheckController = new components.healthcheck.HealthcheckController(controllerComponents)
+    lazy val unitCardController = new components.unitcard.UnitCardController(controllerComponents)
 
-    lazy val router = new Routes(httpErrorHandler, applicationController, assets)
+    lazy val codexRoutes = new codex.Routes(httpErrorHandler, unitCardController)
+
+    lazy val router = new Routes(httpErrorHandler, healthcheckController, assets, codexRoutes)
   }
 
   def load(context: Context): Application = {
