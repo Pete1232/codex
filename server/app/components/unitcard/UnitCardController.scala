@@ -15,10 +15,18 @@
 // limitations under the License.
 package components.unitcard
 
+import cats.data.Reader
 import play.api.mvc.{BaseController, ControllerComponents}
 
 class UnitCardController(val controllerComponents: ControllerComponents) extends BaseController {
 
   def getUnitCard = TODO
 
+}
+
+object UnitCardController {
+  def apply(): Reader[ControllerComponents, UnitCardController] =
+    Reader { (dependencies: (ControllerComponents)) =>
+      new UnitCardController(dependencies)
+    }
 }

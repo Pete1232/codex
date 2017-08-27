@@ -15,6 +15,8 @@
 // limitations under the License.
 package config
 
+import components.healthcheck.HealthcheckController
+import components.unitcard.UnitCardController
 import play.api.ApplicationLoader.Context
 import play.api.{Application, ApplicationLoader, BuiltInComponentsFromContext, LoggerConfigurator}
 import play.filters.HttpFiltersComponents
@@ -25,8 +27,8 @@ class AppLoader extends ApplicationLoader {
   class AppComponents(context: Context) extends BuiltInComponentsFromContext(context)
     with HttpFiltersComponents
     with controllers.AssetsComponents {
-    lazy val healthcheckController = new components.healthcheck.HealthcheckController(controllerComponents)
-    lazy val unitCardController = new components.unitcard.UnitCardController(controllerComponents)
+    lazy val healthcheckController = HealthcheckController().run(controllerComponents)
+    lazy val unitCardController = UnitCardController().run(controllerComponents)
 
     lazy val codexRoutes = new codex.Routes(httpErrorHandler, unitCardController)
 
