@@ -18,17 +18,21 @@ package components.unitcard
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.collections.UnitCardCollection
 import testutils.ComponentTest
 
-class UnitCardComponentTest extends ComponentTest {
+class UnitCardComponentTest extends ComponentTest with UnitCardCollection {
 
   "getUnitCard" must {
-    "be TODO" in {
+    "display a UnitCard if one is found" in { db =>
+
+      insertTestDocument().run(db).unsafeRunTimed(defaultTimeout)
+
       val Some(res) = route(app, FakeRequest("GET", "/codex/unit"))
 
       val result = await(res)
 
-      result.header.status mustBe Status.NOT_IMPLEMENTED
+      result.header.status mustBe Status.OK
     }
   }
 }

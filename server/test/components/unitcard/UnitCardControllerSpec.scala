@@ -15,23 +15,44 @@
 // limitations under the License.
 package components.unitcard
 
-import play.api.http.Status
+import cats.effect.IO
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import testutils.ControllerUnitTest
+import play.api.test.Helpers._
 
-class UnitCardControllerSpec extends ControllerUnitTest {
-  lazy val controller = new UnitCardController(mockControllerComponents)
+class UnitCardControllerSpec extends ControllerUnitTest with UnitCardController {
 
-  "getUnitCard" must {
-    s"be TODO" in {
+  override protected def controllerComponents = mockControllerComponents
 
-      val req = FakeRequest("GET", "/codex/unit")
+  "buildUnitCardAction" must {
+    s"return $OK" in {
+      forAll { name: String =>
+        val req = FakeRequest("GET", "/codex/unit")
 
-      val res = await {
-        controller.getUnitCard(req)
+        val testJson = Json.obj("name" -> name)
+
+        val Some(action) = buildUnitCardAction.run(IO(testJson)).unsafeRunTimed(defaultTimeout)
+
+        val result = await {
+          action(req)
+        }
+
+        result.header.status mustBe OK
       }
+    }
+    "display the input json" in {
+      forAll { name: String =>
+        val req = FakeRequest("GET", "/codex/unit")
 
-      res.header.status mustBe Status.NOT_IMPLEMENTED
+        val testJson = Json.obj("name" -> name)
+
+        val Some(action) = buildUnitCardAction.run(IO(testJson)).unsafeRunTimed(defaultTimeout)
+
+        val result = action(req)
+
+        contentAsJson(result) mustBe testJson
+      }
     }
   }
 }

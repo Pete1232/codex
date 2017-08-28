@@ -23,7 +23,7 @@ import testutils.ComponentTest
 class HealthcheckComponentTest extends ComponentTest {
 
   "ping" must {
-    s"return ${Status.OK} status with no body" in {
+    s"return ${Status.OK} status with no body" in { db =>
 
       val Some(res) = route(app, FakeRequest("GET", "/ping"))
 

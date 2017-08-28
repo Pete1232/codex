@@ -19,14 +19,18 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalamock.scalatest.MockFactory
 import org.scalatest._
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, FiniteDuration, _}
 import scala.concurrent.{Await, Awaitable, ExecutionContext}
+import scala.language.postfixOps
 
-trait UnitTest extends WordSpec with MustMatchers with MockFactory with OneInstancePerTest {
+trait UnitTest extends WordSpec with MustMatchers with MockFactory with OneInstancePerTest with GeneratorDrivenPropertyChecks {
   implicit val actorSystem: ActorSystem = ActorSystem()
   implicit val mat: ActorMaterializer = ActorMaterializer()
   implicit val ec: ExecutionContext = ExecutionContext.global
 
   def await[T](awaitable: Awaitable[T], duration: Duration = Duration.Inf): T = Await.result(awaitable, duration)
+
+  protected val defaultTimeout: FiniteDuration = 1 second
 }

@@ -18,24 +18,27 @@ package repositories.collections
 import repositories.models.UnitCard
 import testutils.IntegrationTest
 
-class UnitCardCollectionIT extends IntegrationTest {
+class UnitCardCollectionIT extends IntegrationTest with UnitCardCollection {
 
   "insertTestDocument" must {
     "insert" in { db =>
-
-      val collection = UnitCardCollection().run(db)
-
-      collection.insertTestDocument().unsafeRunTimed(defaultTimeout) mustBe Some((): Unit)
+      insertTestDocument
+        .run(db)
+        .unsafeRunTimed(defaultTimeout) mustBe Some((): Unit)
     }
   }
 
-  "getUnitCard" must {
+  "getUnitCardFromCollection" must {
     "return the first saved UnitCard from the database" in { db =>
-      val collection = UnitCardCollection().run(db)
 
-      collection.insertTestDocument().unsafeRunTimed(defaultTimeout)
+      insertTestDocument()
+        .run(db)
+        .unsafeRunTimed(defaultTimeout)
 
-      val Some(res) = collection.getUnitCard.unsafeRunTimed(defaultTimeout)
+      val Some(res) =
+        getUnitCardFromCollection
+          .run(db)
+          .unsafeRunTimed(defaultTimeout)
 
       res mustBe UnitCard("bob")
     }

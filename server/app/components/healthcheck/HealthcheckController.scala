@@ -15,18 +15,10 @@
 // limitations under the License.
 package components.healthcheck
 
-import cats.data.Reader
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 
-class HealthcheckController(val controllerComponents: ControllerComponents) extends BaseController {
+class HealthcheckController(val controllerComponents: ControllerComponents)
+  extends BaseController {
 
   def ping: Action[AnyContent] = Action(Ok)
-
-}
-
-object HealthcheckController {
-  def apply(): Reader[ControllerComponents, HealthcheckController] =
-    Reader { (components: ControllerComponents) =>
-      new HealthcheckController(components)
-    }
 }

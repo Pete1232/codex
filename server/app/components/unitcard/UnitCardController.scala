@@ -16,17 +16,16 @@
 package components.unitcard
 
 import cats.data.Reader
-import play.api.mvc.{BaseController, ControllerComponents}
+import cats.effect.IO
+import play.api.libs.json.JsObject
+import play.api.mvc._
 
-class UnitCardController(val controllerComponents: ControllerComponents) extends BaseController {
-
-  def getUnitCard = TODO
-
-}
-
-object UnitCardController {
-  def apply(): Reader[ControllerComponents, UnitCardController] =
-    Reader { (dependencies: (ControllerComponents)) =>
-      new UnitCardController(dependencies)
+trait UnitCardController extends BaseController {
+  protected def buildUnitCardAction = Reader { (unitCardIO: IO[JsObject]) =>
+    unitCardIO map { unitCard =>
+      Action { implicit req =>
+        Ok(unitCard)
+      }
     }
+  }
 }

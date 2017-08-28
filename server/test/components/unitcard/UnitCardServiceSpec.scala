@@ -13,19 +13,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package testutils
+package components.unitcard
 
-import config.AppLoader
-import org.scalatestplus.play.{BaseOneAppPerTest, FakeApplicationFactory}
-import play.api.{Application, ApplicationLoader, Environment}
+import cats.effect.IO
+import play.api.libs.json.Json
+import repositories.models.UnitCard
+import testutils.UnitTest
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Awaitable}
+class UnitCardServiceSpec extends UnitTest with UnitCardService {
+  "convertUnitCardToJson" must {
+    "convert a given UnitCard to a JsObject" in {
+      forAll { name: String =>
 
-trait ComponentTest extends IntegrationTest with BaseOneAppPerTest with FakeApplicationFactory {
-  def await[T](awaitable: Awaitable[T], duration: Duration = Duration.Inf): T = Await.result(awaitable, duration)
+        val testUnitCard = IO(UnitCard(name))
 
-  lazy val appLoader = new AppLoader
+        val Some(result) = convertUnitCardToJson.run(testUnitCard).unsafeRunTimed(defaultTimeout)
 
-  override def fakeApplication(): Application = appLoader.load(ApplicationLoader.createContext(Environment.simple()))
+        result mustBe Json.obj("name" -> name)
+      }
+    }
+  }
 }

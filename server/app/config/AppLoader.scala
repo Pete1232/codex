@@ -16,19 +16,28 @@
 package config
 
 import components.healthcheck.HealthcheckController
-import components.unitcard.UnitCardController
+import components.unitcard.{UnitCardController, UnitCardComponent}
 import play.api.ApplicationLoader.Context
 import play.api.{Application, ApplicationLoader, BuiltInComponentsFromContext, LoggerConfigurator}
 import play.filters.HttpFiltersComponents
+import repositories.utils.Database
 import router.Routes
+
+import scala.concurrent.ExecutionContext
 
 class AppLoader extends ApplicationLoader {
 
   class AppComponents(context: Context) extends BuiltInComponentsFromContext(context)
     with HttpFiltersComponents
-    with controllers.AssetsComponents {
-    lazy val healthcheckController = HealthcheckController().run(controllerComponents)
-    lazy val unitCardController = UnitCardController().run(controllerComponents)
+    with controllers.AssetsComponents
+    with Database {
+
+    lazy val ec: ExecutionContext = ExecutionContext.global
+
+    lazy val db = database.run(AppConfig)
+
+    lazy val healthcheckController = new HealthcheckController(controllerComponents)
+    lazy val unitCardController = new UnitCardComponent(controllerComponents, db)(ec)
 
     lazy val codexRoutes = new codex.Routes(httpErrorHandler, unitCardController)
 

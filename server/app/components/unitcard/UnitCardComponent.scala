@@ -13,19 +13,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package testutils
+package components.unitcard
 
-import config.AppLoader
-import org.scalatestplus.play.{BaseOneAppPerTest, FakeApplicationFactory}
-import play.api.{Application, ApplicationLoader, Environment}
+import org.mongodb.scala.MongoDatabase
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import repositories.collections.UnitCardCollection
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Awaitable}
+import scala.concurrent.ExecutionContext
 
-trait ComponentTest extends IntegrationTest with BaseOneAppPerTest with FakeApplicationFactory {
-  def await[T](awaitable: Awaitable[T], duration: Duration = Duration.Inf): T = Await.result(awaitable, duration)
+class UnitCardComponent(val controllerComponents: ControllerComponents, withDatabase: MongoDatabase)
+                       (implicit val ec: ExecutionContext)
+  extends UnitCardController with UnitCardService with UnitCardCollection {
 
-  lazy val appLoader = new AppLoader
-
-  override def fakeApplication(): Application = appLoader.load(ApplicationLoader.createContext(Environment.simple()))
+  def getUnitCard: Action[AnyContent] =
+    getUnitCardFromCollection()
+      .andThen(convertUnitCardToJson())
+      .andThen(buildUnitCardAction)
+      .run(withDatabase).unsafeRunSync()
 }

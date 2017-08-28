@@ -24,29 +24,30 @@ import utils.Constants
 
 import scala.concurrent.ExecutionContext
 
-class UnitCardCollection(db: MongoDatabase)(implicit val ec: ExecutionContext) {
+trait UnitCardCollection {
 
-  private val collection = db.getCollection[UnitCard](Constants.Collections.PLAYERS)
-
-  def insertTestDocument(): IO[Unit] = {
-    val doc = UnitCard("bob")
-    IO.fromFuture(Eval.later(
-      collection
-        .insertOne(doc)
-        .head()
-        .map(_ => (): Unit)
-    ))
+  private val getCollection = Reader { db: MongoDatabase =>
+    db.getCollection[UnitCard](Constants.Collections.PLAYERS)
   }
 
-  def getUnitCard: IO[UnitCard] = {
-    IO.fromFuture(Eval.later(
-      collection.find().head()
-    ))
-  }
-}
+  protected def insertTestDocument()(implicit ec: ExecutionContext) =
+    for {
+      collection <- getCollection
+    } yield {
+      val doc = UnitCard("bob")
+      IO.fromFuture(Eval.later(
+        collection.insertOne(doc)
+          .head()
+          .map(_ => (): Unit)
+      ))
+    }
 
-object UnitCardCollection {
-  def apply()(implicit ec: ExecutionContext): Reader[MongoDatabase, UnitCardCollection] = Reader { (db: MongoDatabase) =>
-    new UnitCardCollection(db)(ec)
-  }
+  protected def getUnitCardFromCollection()(implicit ec: ExecutionContext) =
+    for {
+      collection <- getCollection
+    } yield {
+      IO.fromFuture(Eval.later(
+        collection.find().head()
+      ))
+    }
 }
