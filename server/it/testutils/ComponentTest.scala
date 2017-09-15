@@ -16,13 +16,13 @@
 package testutils
 
 import config.AppLoader
-import org.scalatestplus.play.{BaseOneAppPerTest, FakeApplicationFactory}
+import org.scalatestplus.play.{BaseOneAppPerSuite, FakeApplicationFactory}
 import play.api.{Application, ApplicationLoader, Environment}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Awaitable}
 
-trait ComponentTest extends IntegrationTest with BaseOneAppPerTest with FakeApplicationFactory {
+trait ComponentTest extends IntegrationTest with BaseOneAppPerSuite with FakeApplicationFactory {
   def await[T](awaitable: Awaitable[T], duration: Duration = Duration.Inf): T = Await.result(awaitable, duration)
 
   lazy val appLoader = new AppLoader

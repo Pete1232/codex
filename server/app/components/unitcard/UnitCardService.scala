@@ -18,7 +18,6 @@ package components.unitcard
 import cats.data.Reader
 import cats.effect.IO
 import play.api.libs.json.{JsObject, Json}
-import repositories.models.UnitCard
 
 import scala.concurrent.ExecutionContext
 

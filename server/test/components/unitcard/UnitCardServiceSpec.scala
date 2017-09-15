@@ -17,7 +17,6 @@ package components.unitcard
 
 import cats.effect.IO
 import play.api.libs.json.Json
-import repositories.models.UnitCard
 import testutils.UnitTest
 
 class UnitCardServiceSpec extends UnitTest with UnitCardService {

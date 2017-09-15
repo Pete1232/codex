@@ -13,13 +13,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package repositories.collections
+package components.unitcard
 
-import cats.{Eval, Id}
-import cats.data.{Kleisli, Reader}
+import cats.Eval
+import cats.data.Reader
 import cats.effect.IO
 import org.mongodb.scala.{MongoCollection, MongoDatabase}
-import repositories.models.UnitCard
 import utils.Constants
 
 import scala.concurrent.ExecutionContext

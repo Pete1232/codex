@@ -15,19 +15,4 @@
 // limitations under the License.
 package components.unitcard
 
-import org.mongodb.scala.MongoDatabase
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import repositories.collections.UnitCardCollection
-
-import scala.concurrent.ExecutionContext
-
-class UnitCardComponent(val controllerComponents: ControllerComponents, withDatabase: MongoDatabase)
-                       (implicit val ec: ExecutionContext)
-  extends UnitCardController with UnitCardService with UnitCardCollection {
-
-  def getUnitCard: Action[AnyContent] =
-    getUnitCardFromCollection()
-      .andThen(convertUnitCardToJson())
-      .andThen(buildUnitCardAction)
-      .run(withDatabase).unsafeRunSync()
-}
+final case class UnitCard(name: String)

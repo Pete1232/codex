@@ -13,6 +13,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package repositories.models
+package database
 
-final case class UnitCard(name: String)
+import components.unitcard.UnitCard
+import org.bson.codecs.configuration.CodecRegistry
+
+object Codecs {
+  def buildCodecs(): CodecRegistry = {
+    import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
+    import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
+    import org.mongodb.scala.bson.codecs.Macros._
+    fromRegistries(fromProviders(classOf[UnitCard]), DEFAULT_CODEC_REGISTRY)
+  }
+
+}

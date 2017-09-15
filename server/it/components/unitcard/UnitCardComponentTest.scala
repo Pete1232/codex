@@ -18,7 +18,6 @@ package components.unitcard
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.collections.UnitCardCollection
 import testutils.ComponentTest
 
 class UnitCardComponentTest extends ComponentTest with UnitCardCollection {

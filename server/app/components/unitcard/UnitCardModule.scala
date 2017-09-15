@@ -13,17 +13,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package repositories.utils
+package components.unitcard
 
-import org.bson.codecs.configuration.CodecRegistry
+import org.mongodb.scala.MongoDatabase
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 
-object Codecs {
-  def buildCodecs(): CodecRegistry = {
-    import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
-    import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
-    import org.mongodb.scala.bson.codecs.Macros._
-    import repositories.models._
-    fromRegistries(fromProviders(classOf[UnitCard]), DEFAULT_CODEC_REGISTRY)
-  }
+import scala.concurrent.ExecutionContext
 
+class UnitCardModule(val controllerComponents: ControllerComponents, withDatabase: MongoDatabase)
+                    (implicit val ec: ExecutionContext)
+  extends UnitCardController with UnitCardService with UnitCardCollection {
+
+  def getUnitCard: Action[AnyContent] =
+    getUnitCardFromCollection()
+      .andThen(convertUnitCardToJson())
+      .andThen(buildUnitCardAction)
+      .run(withDatabase).unsafeRunSync()
 }

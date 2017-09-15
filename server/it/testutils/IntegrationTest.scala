@@ -18,9 +18,9 @@ package testutils
 import cats.Eval
 import cats.effect.IO
 import config.AppConfig
+import database.Database
 import org.mongodb.scala.MongoDatabase
 import org.scalatest._
-import repositories.utils.Database
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
