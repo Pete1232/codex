@@ -21,11 +21,12 @@ import play.api.libs.json.JsObject
 import play.api.mvc._
 
 trait UnitCardController extends BaseController {
-  protected def buildUnitCardAction = Reader { (unitCardIO: IO[JsObject]) =>
-    unitCardIO map { unitCard =>
-      Action { implicit req =>
-        Ok(unitCard)
+  protected def buildUnitCardAction: Reader[IO[JsObject], IO[Action[AnyContent]]] =
+    Reader { (unitCardIO: IO[JsObject]) =>
+      unitCardIO map { unitCard =>
+        Action { implicit req =>
+          Ok(unitCard)
+        }
       }
     }
-  }
 }

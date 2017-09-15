@@ -17,15 +17,16 @@ package components.unitcard
 
 import cats.data.Reader
 import cats.effect.IO
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import repositories.models.UnitCard
 
 import scala.concurrent.ExecutionContext
 
 trait UnitCardService {
-  protected def convertUnitCardToJson()(implicit ec: ExecutionContext) = Reader { (unitCardIO: IO[UnitCard]) =>
-    unitCardIO map (unitCard =>
-      Json.obj("name" -> unitCard.name) // TODO json parsing library? Use Mongo codecs?
-      )
-  }
+  protected def convertUnitCardToJson()(implicit ec: ExecutionContext): Reader[IO[UnitCard], IO[JsObject]] =
+    Reader { (unitCardIO: IO[UnitCard]) =>
+      unitCardIO map (unitCard =>
+        Json.obj("name" -> unitCard.name) // TODO json parsing library? Use Mongo codecs?
+        )
+    }
 }

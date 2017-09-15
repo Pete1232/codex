@@ -15,10 +15,10 @@
 // limitations under the License.
 package repositories.collections
 
-import cats.Eval
-import cats.data.Reader
+import cats.{Eval, Id}
+import cats.data.{Kleisli, Reader}
 import cats.effect.IO
-import org.mongodb.scala.MongoDatabase
+import org.mongodb.scala.{MongoCollection, MongoDatabase}
 import repositories.models.UnitCard
 import utils.Constants
 
@@ -26,11 +26,12 @@ import scala.concurrent.ExecutionContext
 
 trait UnitCardCollection {
 
-  private val getCollection = Reader { db: MongoDatabase =>
-    db.getCollection[UnitCard](Constants.Collections.PLAYERS)
-  }
+  private val getCollection: Reader[MongoDatabase, MongoCollection[UnitCard]] =
+    Reader { db: MongoDatabase =>
+      db.getCollection[UnitCard](Constants.Collections.PLAYERS)
+    }
 
-  protected def insertTestDocument()(implicit ec: ExecutionContext) =
+  protected def insertTestDocument()(implicit ec: ExecutionContext): Reader[MongoDatabase, IO[Unit]] =
     for {
       collection <- getCollection
     } yield {
@@ -42,7 +43,7 @@ trait UnitCardCollection {
       ))
     }
 
-  protected def getUnitCardFromCollection()(implicit ec: ExecutionContext) =
+  protected def getUnitCardFromCollection()(implicit ec: ExecutionContext): Reader[MongoDatabase, IO[UnitCard]] =
     for {
       collection <- getCollection
     } yield {
