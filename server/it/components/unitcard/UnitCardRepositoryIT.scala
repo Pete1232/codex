@@ -15,18 +15,31 @@
 // limitations under the License.
 package components.unitcard
 
-import org.mongodb.scala.MongoDatabase
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import testutils.IntegrationTest
 
-import scala.concurrent.ExecutionContext
+class UnitCardRepositoryIT extends IntegrationTest with UnitCardRepository {
 
-class UnitCardModule(val controllerComponents: ControllerComponents, withDatabase: MongoDatabase)
-                    (implicit val ec: ExecutionContext)
-  extends UnitCardController with UnitCardService with UnitCardCollection {
+  "insertTestDocument" must {
+    "insert" in { db =>
+      insertTestDocument
+        .run(db)
+        .unsafeRunTimed(defaultTimeout) mustBe Some((): Unit)
+    }
+  }
 
-  def getUnitCard: Action[AnyContent] =
-    getUnitCardFromCollection()
-      .andThen(convertUnitCardToJson())
-      .andThen(buildUnitCardAction)
-      .run(withDatabase).unsafeRunSync()
+  "getUnitCardFromCollection" must {
+    "return the first saved UnitCard from the database" in { db =>
+
+      insertTestDocument()
+        .run(db)
+        .unsafeRunTimed(defaultTimeout)
+
+      val Some(res) =
+        getUnitCardFromCollection
+          .run(db)
+          .unsafeRunTimed(defaultTimeout)
+
+      res mustBe UnitCard("bob")
+    }
+  }
 }

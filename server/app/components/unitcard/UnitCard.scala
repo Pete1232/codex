@@ -15,4 +15,10 @@
 // limitations under the License.
 package components.unitcard
 
+import play.api.libs.json.Json
+
 final case class UnitCard(name: String)
+
+object UnitCard {
+  implicit val formats = Json.format[UnitCard]
+}

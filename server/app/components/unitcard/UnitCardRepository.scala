@@ -18,31 +18,19 @@ package components.unitcard
 import cats.Eval
 import cats.data.Reader
 import cats.effect.IO
-import org.mongodb.scala.{MongoCollection, MongoDatabase}
+import org.mongodb.scala.{Completed, MongoCollection, MongoDatabase}
 import utils.Constants
 
 import scala.concurrent.ExecutionContext
 
-trait UnitCardCollection {
+trait UnitCardRepository {
 
   private val getCollection: Reader[MongoDatabase, MongoCollection[UnitCard]] =
     Reader { db: MongoDatabase =>
       db.getCollection[UnitCard](Constants.Collections.PLAYERS)
     }
 
-  protected def insertTestDocument()(implicit ec: ExecutionContext): Reader[MongoDatabase, IO[Unit]] =
-    for {
-      collection <- getCollection
-    } yield {
-      val doc = UnitCard("bob")
-      IO.fromFuture(Eval.later(
-        collection.insertOne(doc)
-          .head()
-          .map(_ => (): Unit)
-      ))
-    }
-
-  protected def getUnitCardFromCollection()(implicit ec: ExecutionContext): Reader[MongoDatabase, IO[UnitCard]] =
+  def getUnitCardFromCollection()(implicit ec: ExecutionContext): Reader[MongoDatabase, IO[UnitCard]] =
     for {
       collection <- getCollection
     } yield {
@@ -50,4 +38,14 @@ trait UnitCardCollection {
         collection.find().head()
       ))
     }
+
+  def insertUnitCardToCollection(unitCard: UnitCard)
+                                          (implicit ec: ExecutionContext): Reader[MongoDatabase, IO[Completed]] =
+      for {
+        collection <- getCollection
+      } yield {
+        IO.fromFuture(Eval.later(
+          collection.insertOne(unitCard).head()
+        ))
+      }
 }

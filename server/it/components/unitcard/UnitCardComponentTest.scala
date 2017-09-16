@@ -20,7 +20,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import testutils.ComponentTest
 
-class UnitCardComponentTest extends ComponentTest with UnitCardCollection {
+class UnitCardComponentTest extends ComponentTest with UnitCardRepository {
 
   "getUnitCard" must {
     "display a UnitCard if one is found" in { db =>

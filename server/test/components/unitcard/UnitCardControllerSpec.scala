@@ -21,7 +21,7 @@ import play.api.test.FakeRequest
 import testutils.ControllerUnitTest
 import play.api.test.Helpers._
 
-class UnitCardControllerSpec extends ControllerUnitTest with UnitCardController {
+class UnitCardServiceSpec extends ControllerUnitTest with UnitCardService {
 
   override protected def controllerComponents = mockControllerComponents
 

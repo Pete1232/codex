@@ -17,15 +17,30 @@ package components.unitcard
 
 import cats.data.Reader
 import cats.effect.IO
-import play.api.libs.json.{JsObject, Json}
+import org.mongodb.scala.MongoDatabase
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
+trait UnitCardService extends UnitCardRepository {
 
-trait UnitCardService {
-  protected def convertUnitCardToJson()(implicit ec: ExecutionContext): Reader[IO[UnitCard], IO[JsObject]] =
-    Reader { (unitCardIO: IO[UnitCard]) =>
-      unitCardIO map (unitCard =>
-        Json.obj("name" -> unitCard.name) // TODO json parsing library? Use Mongo codecs?
+  def getUnitCardAction(request: Request[AnyContent]): Reader[MongoDatabase, IO[JsValue]] = {
+    getUnitCardFromCollection()
+      .map(_.map(unitCard =>
+        Json.toJson(unitCard)
+      ))
+  }
+
+  def insertUnitCardAction(request: Request[AnyContent]): Option[Reader[MongoDatabase, JsValue]] = {
+
+    val unitCard = request.body.asJson.flatMap {
+      _.validate[UnitCard].asOpt
+    }
+
+    unitCard map { card =>
+      insertUnitCardToCollection(card)
+        .map(completed =>
+          Json.parse(completed.toString())
         )
     }
+  }
 }

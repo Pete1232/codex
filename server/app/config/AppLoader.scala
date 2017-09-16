@@ -16,7 +16,7 @@
 package config
 
 import components.healthcheck.HealthcheckController
-import components.unitcard.{UnitCardModule, UnitCardController}
+import components.unitcard.{UnitCardController, UnitCardService}
 import database.Database
 import play.api.ApplicationLoader.Context
 import play.api.{Application, ApplicationLoader, BuiltInComponentsFromContext, LoggerConfigurator}
@@ -37,7 +37,7 @@ class AppLoader extends ApplicationLoader {
     lazy val db = database.run(AppConfig)
 
     lazy val healthcheckController = new HealthcheckController(controllerComponents)
-    lazy val unitCardController = new UnitCardModule(controllerComponents, db)(ec)
+    lazy val unitCardController = new UnitCardController(controllerComponents, db)(ec)
 
     lazy val codexRoutes = new codex.Routes(httpErrorHandler, unitCardController)
 
