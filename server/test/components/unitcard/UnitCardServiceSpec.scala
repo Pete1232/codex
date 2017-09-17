@@ -16,19 +16,47 @@
 package components.unitcard
 
 import cats.effect.IO
-import play.api.libs.json.Json
+import org.mongodb.scala.Completed
+import play.api.libs.json.{JsString, Json}
+import play.api.mvc.AnyContentAsJson
+import play.api.test.FakeRequest
 import testutils.UnitTest
 
-class UnitCardServiceSpec extends UnitTest with UnitCardService {
-  "convertUnitCardToJson" must {
+import scala.concurrent.ExecutionContext
+
+class UnitCardServiceSpec extends UnitTest {
+
+  private lazy val repository = mock[UnitCardRepository]
+  private lazy val service = new UnitCardService(repository)
+
+  "getUnitCardAsJson" must {
     "convert a given UnitCard to a JsObject" in {
       forAll { name: String =>
+        val testUnitCard = UnitCard(name)
 
-        val testUnitCard = IO(UnitCard(name))
+        (repository.getUnitCardFromCollection()(_: ExecutionContext)) expects * returning IO(testUnitCard)
 
-        val Some(result) = convertUnitCardToJson.run(testUnitCard).unsafeRunTimed(defaultTimeout)
+        val Some(result) = service.getUnitCardAsJson.unsafeRunTimed(defaultTimeout)
 
         result mustBe Json.obj("name" -> name)
+      }
+    }
+  }
+  "insertUnitCardFromRequest" must {
+    "return the correct json body if the card was saved correctly" in {
+      forAll { name: String =>
+        val testUnitCard = UnitCard(name)
+
+        val request = FakeRequest("POST", "/codex/unit")
+          .withBody(AnyContentAsJson(Json.toJson(testUnitCard)))
+
+        (repository.insertUnitCardToCollection(_: UnitCard)(_: ExecutionContext)) expects(testUnitCard, *) returning IO(Completed())
+
+        val Some(result) = service
+          .insertUnitCardFromRequest(request)
+          .flatMap(_.unsafeRunTimed(defaultTimeout))
+
+        result mustBe Json.obj("result" -> Completed().toString())
       }
     }
   }

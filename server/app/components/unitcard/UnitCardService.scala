@@ -15,31 +15,31 @@
 // limitations under the License.
 package components.unitcard
 
-import cats.data.Reader
 import cats.effect.IO
-import org.mongodb.scala.MongoDatabase
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 
-trait UnitCardService extends UnitCardRepository {
+import scala.concurrent.ExecutionContext
 
-  def getUnitCardAction(request: Request[AnyContent]): Reader[MongoDatabase, IO[JsValue]] = {
-    getUnitCardFromCollection()
-      .map(_.map(unitCard =>
+class UnitCardService(unitCardRepository: UnitCardRepository) {
+
+  def getUnitCardAsJson(implicit ec: ExecutionContext): IO[JsValue] = {
+    unitCardRepository.getUnitCardFromCollection()
+      .map(unitCard =>
         Json.toJson(unitCard)
-      ))
+      )
   }
 
-  def insertUnitCardAction(request: Request[AnyContent]): Option[Reader[MongoDatabase, JsValue]] = {
-
+  def insertUnitCardFromRequest(request: Request[AnyContent])
+                               (implicit ec: ExecutionContext): Option[IO[JsValue]] = {
     val unitCard = request.body.asJson.flatMap {
       _.validate[UnitCard].asOpt
     }
 
     unitCard map { card =>
-      insertUnitCardToCollection(card)
+      unitCardRepository.insertUnitCardToCollection(card)
         .map(completed =>
-          Json.parse(completed.toString())
+          Json.obj("result" -> completed.toString())
         )
     }
   }

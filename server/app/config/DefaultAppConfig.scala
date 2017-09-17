@@ -13,26 +13,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package components.unitcard
+package config
 
-import cats.Eval
-import cats.effect.IO
-import org.mongodb.scala.{Completed, MongoCollection, MongoDatabase}
+import com.typesafe.config.{Config, ConfigFactory}
 
-import scala.concurrent.ExecutionContext
+object DefaultAppConfig extends AppConfig {
+  private val conf: Config = ConfigFactory.load()
 
-class UnitCardRepository(database: MongoDatabase) {
+  private val mongoConf = conf.getConfig("mongodb")
+  private val credentials = mongoConf.getConfig("credentials")
 
-  private lazy val collection: MongoCollection[UnitCard] = database.getCollection[UnitCard]("unitCards")
+  val mongoUser: String = credentials.getString("user")
+  val mongoPassword: String = credentials.getString("password")
+  val mongoAuthDbName: String = credentials.getString("dbName")
+  val mongoHost: String = mongoConf.getString("host")
+}
 
-  def getUnitCardFromCollection()(implicit ec: ExecutionContext): IO[UnitCard] =
-    IO.fromFuture(Eval.later(
-      collection.find().head()
-    ))
+trait AppConfig {
+  def mongoUser: String
 
-  def insertUnitCardToCollection(unitCard: UnitCard)
-                                (implicit ec: ExecutionContext): IO[Completed] =
-    IO.fromFuture(Eval.later(
-      collection.insertOne(unitCard).head()
-    ))
+  def mongoPassword: String
+
+  def mongoAuthDbName: String
+
+  def mongoHost: String
 }

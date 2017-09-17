@@ -17,8 +17,8 @@ package testutils
 
 import cats.Eval
 import cats.effect.IO
-import config.AppConfig
-import database.Database
+import config.DefaultAppConfig
+import database.DatabaseProvider
 import org.mongodb.scala.MongoDatabase
 import org.scalatest._
 
@@ -26,24 +26,29 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-trait IntegrationTest extends fixture.WordSpec with MustMatchers {
+trait IntegrationTest extends fixture.WordSpec with MustMatchers with TestDatabase with BeforeAndAfterAll {
 
   override type FixtureParam = MongoDatabase
 
-  object TestDatabase extends Database {
-    val db = database.run(AppConfig)
-  }
-
   private def dropDatabase = {
     IO.fromFuture(Eval.later(
-      TestDatabase.db.drop().head().map(_ => (): Unit)
+      db.drop().head().map(_ => (): Unit)
     ))
   }
 
-  override def withFixture(test: OneArgTest): Outcome = {
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    dropDatabase.unsafeRunTimed(defaultTimeout)
+  }
 
+  override def afterAll(): Unit = {
+    dropDatabase.unsafeRunTimed(defaultTimeout)
+    super.afterAll()
+  }
+
+  override def withFixture(test: OneArgTest): Outcome = {
     try {
-      withFixture(test.toNoArgTest(TestDatabase.db))
+      withFixture(test.toNoArgTest(db))
     } finally {
       dropDatabase.unsafeRunSync()
     }

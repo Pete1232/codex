@@ -15,31 +15,36 @@
 // limitations under the License.
 package components.unitcard
 
+import org.mongodb.scala.Completed
 import testutils.IntegrationTest
 
-class UnitCardRepositoryIT extends IntegrationTest with UnitCardRepository {
+class UnitCardRepositoryIT extends IntegrationTest {
 
-  "insertTestDocument" must {
-    "insert" in { db =>
-      insertTestDocument
-        .run(db)
-        .unsafeRunTimed(defaultTimeout) mustBe Some((): Unit)
+  val repository = new UnitCardRepository(db)
+
+  "insertUnitCardToCollection" must {
+    "insert the given unit card to the database" in { db =>
+
+      val testUnitCard = UnitCard("test")
+
+      repository.insertUnitCardToCollection(testUnitCard)
+        .unsafeRunTimed(defaultTimeout) mustBe Some(Completed())
     }
   }
 
   "getUnitCardFromCollection" must {
     "return the first saved UnitCard from the database" in { db =>
 
-      insertTestDocument()
-        .run(db)
+      val testUnitCard = UnitCard("test")
+
+      repository.insertUnitCardToCollection(testUnitCard)
         .unsafeRunTimed(defaultTimeout)
 
       val Some(res) =
-        getUnitCardFromCollection
-          .run(db)
+        repository.getUnitCardFromCollection
           .unsafeRunTimed(defaultTimeout)
 
-      res mustBe UnitCard("bob")
+      res mustBe UnitCard("test")
     }
   }
 }

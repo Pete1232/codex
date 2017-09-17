@@ -20,18 +20,21 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import testutils.ComponentTest
 
-class UnitCardComponentTest extends ComponentTest with UnitCardRepository {
+class UnitCardComponentTest extends ComponentTest {
+
+  val repository = new UnitCardRepository(db)
 
   "getUnitCard" must {
-    "display a UnitCard if one is found" in { db =>
+    "display a UnitCard if one is found" in { _ =>
 
-      insertTestDocument().run(db).unsafeRunTimed(defaultTimeout)
+      val testUnitCard = UnitCard("test")
+
+      repository.insertUnitCardToCollection(testUnitCard)
+        .unsafeRunTimed(defaultTimeout)
 
       val Some(res) = route(app, FakeRequest("GET", "/codex/unit"))
 
-      val result = await(res)
-
-      result.header.status mustBe Status.OK
+      status(res) mustBe Status.OK
     }
   }
 }

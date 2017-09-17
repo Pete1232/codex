@@ -15,18 +15,17 @@
 // limitations under the License.
 package database
 
-import cats.data.Reader
 import com.mongodb.MongoCredential._
 import config.AppConfig
 import org.mongodb.scala.connection.ClusterSettings
 
 import scala.collection.JavaConverters._
 
-trait Database {
+class DatabaseProvider(config: AppConfig) {
 
   import org.mongodb.scala._
 
-  private val credential: Reader[AppConfig, MongoCredential] = Reader { (config: AppConfig) =>
+  private val credential: MongoCredential = {
     import config._
     createScramSha1Credential(
       mongoUser,
@@ -35,26 +34,19 @@ trait Database {
     )
   }
 
-  private val clusterSettings = Reader { (config: AppConfig) =>
+  private val clusterSettings: ClusterSettings =
     ClusterSettings.builder()
       .hosts(List(new ServerAddress(config.mongoHost)).asJava)
       .build()
-  }
 
-  private val client =
-    for {
-      cred <- credential
-      cluster <- clusterSettings
-    } yield {
-      MongoClientSettings.builder()
-        .clusterSettings(cluster)
-        .credentialList(List(cred).asJava)
-        .build()
-    }
+  private val client: MongoClientSettings =
+    MongoClientSettings.builder()
+      .clusterSettings(clusterSettings)
+      .credentialList(List(credential).asJava)
+      .build()
 
-  protected val database = client.map(settings =>
-    MongoClient(clientSettings = settings)
+  val database: MongoDatabase =
+    MongoClient(clientSettings = client)
       .getDatabase("cc")
       .withCodecRegistry(Codecs.buildCodecs())
-  )
 }

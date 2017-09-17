@@ -13,28 +13,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package config
+package testutils
 
-import com.typesafe.config.{Config, ConfigFactory}
+import config.DefaultAppConfig
+import database.DatabaseProvider
+import org.mongodb.scala.MongoDatabase
 
-object AppConfig extends AppConfig {
-  private val conf: Config = ConfigFactory.load()
+trait TestDatabase {
+  private val dbProvider = new DatabaseProvider(DefaultAppConfig)
 
-  private val mongoConf = conf.getConfig("mongodb")
-  private val credentials = mongoConf.getConfig("credentials")
-
-  val mongoUser: String = credentials.getString("user")
-  val mongoPassword: String = credentials.getString("password")
-  val mongoAuthDbName: String = credentials.getString("dbName")
-  val mongoHost: String = mongoConf.getString("host")
-}
-
-trait AppConfig {
-  def mongoUser: String
-
-  def mongoPassword: String
-
-  def mongoAuthDbName: String
-
-  def mongoHost: String
+  protected val db: MongoDatabase = dbProvider.database
 }

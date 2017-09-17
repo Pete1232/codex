@@ -16,8 +16,8 @@
 package config
 
 import components.healthcheck.HealthcheckController
-import components.unitcard.{UnitCardController, UnitCardService}
-import database.Database
+import components.unitcard.UnitCardComponent
+import database.DatabaseProvider
 import play.api.ApplicationLoader.Context
 import play.api.{Application, ApplicationLoader, BuiltInComponentsFromContext, LoggerConfigurator}
 import play.filters.HttpFiltersComponents
@@ -29,17 +29,16 @@ class AppLoader extends ApplicationLoader {
 
   class AppComponents(context: Context) extends BuiltInComponentsFromContext(context)
     with HttpFiltersComponents
-    with controllers.AssetsComponents
-    with Database {
+    with controllers.AssetsComponents {
 
-    lazy val ec: ExecutionContext = ExecutionContext.global
+    private lazy val ec: ExecutionContext = ExecutionContext.global
 
-    lazy val db = database.run(AppConfig)
+    private lazy val db = new DatabaseProvider(DefaultAppConfig).database
 
-    lazy val healthcheckController = new HealthcheckController(controllerComponents)
-    lazy val unitCardController = new UnitCardController(controllerComponents, db)(ec)
+    private lazy val healthcheckController = new HealthcheckController(controllerComponents)
+    private lazy val unitCardController = new UnitCardComponent(controllerComponents, db)(ec).controller
 
-    lazy val codexRoutes = new codex.Routes(httpErrorHandler, unitCardController)
+    private lazy val codexRoutes = new codex.Routes(httpErrorHandler, unitCardController)
 
     lazy val router = new Routes(httpErrorHandler, healthcheckController, assets, codexRoutes)
   }

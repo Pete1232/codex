@@ -1,1 +1,1 @@
-GET         /unit               components.unitcard.UnitCardComponent.getUnitCard
+GET         /unit               components.unitcard.UnitCardController.getUnitCard
