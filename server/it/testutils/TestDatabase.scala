@@ -15,12 +15,12 @@
 // limitations under the License.
 package testutils
 
-import config.DefaultAppConfig
+import config.AppConfig
 import database.DatabaseProvider
 import org.mongodb.scala.MongoDatabase
 
 trait TestDatabase {
-  private val dbProvider = new DatabaseProvider(DefaultAppConfig)
+  private val dbProvider = new DatabaseProvider(AppConfig)
 
   protected val db: MongoDatabase = dbProvider.database
 }

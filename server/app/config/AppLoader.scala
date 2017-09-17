@@ -33,7 +33,7 @@ class AppLoader extends ApplicationLoader {
 
     private lazy val ec: ExecutionContext = ExecutionContext.global
 
-    private lazy val db = new DatabaseProvider(DefaultAppConfig).database
+    private lazy val db = new DatabaseProvider(AppConfig).database
 
     private lazy val healthcheckController = new HealthcheckController(controllerComponents)
     private lazy val unitCardController = new UnitCardComponent(controllerComponents, db)(ec).controller

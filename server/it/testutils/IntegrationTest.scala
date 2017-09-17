@@ -17,7 +17,7 @@ package testutils
 
 import cats.Eval
 import cats.effect.IO
-import config.DefaultAppConfig
+import config.AppConfig
 import database.DatabaseProvider
 import org.mongodb.scala.MongoDatabase
 import org.scalatest._

@@ -17,7 +17,7 @@ package config
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-object DefaultAppConfig extends AppConfig {
+object AppConfig extends AppConfig {
   private val conf: Config = ConfigFactory.load()
 
   private val mongoConf = conf.getConfig("mongodb")
